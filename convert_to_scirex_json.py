@@ -27,12 +27,14 @@ def main():
         sentences.append((len(words), len(words)+len(tokens)))
         words.extend(tokens)
         for sent in nlp(summary).sents:
-            tokens = [t.text for t in nlp(sent.text)]
+            tokens = [t.text for t in nlp(sent.text, disable=["parser"])]
             sentences.append((len(words), len(words)+len(tokens)))
             words.extend(tokens)
 
+        doc_id = f"{data['id']}/{data['published_parsed'][0]}/{data['published_parsed'][1]}"
+
         result = {
-            'doc_id': data['id'],
+            'doc_id': doc_id,
             'words': words,
             'sentences': sentences,
             'sections': [[0, len(words)]],
