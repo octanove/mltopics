@@ -8,6 +8,8 @@ def main():
         num_dumped = 0
 
         while num_dumped != 1000:
+            num_dumped = 0
+
             papers = []
 
             print(f'Running query starting {i}...', file=sys.stderr)

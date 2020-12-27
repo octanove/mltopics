@@ -7,6 +7,7 @@ from scipy.stats import chisquare
 def main():
     mention_counts = defaultdict(Counter)
     mode = sys.argv[1]
+    num_papers = Counter()
     assert mode in {'yearly', 'yearly-test', 'monthly'}
 
     for line in sys.stdin:
@@ -23,6 +24,8 @@ def main():
                 key = f'{year}/{month:02d}'
 
             mention_counts[key].update(mentions)
+
+        num_papers[key] += 1
     
     if mode == 'yearly':
         for key, counts in mention_counts.items():
@@ -31,8 +34,8 @@ def main():
                 print('\t', m, c)
 
     elif mode == 'yearly-test':
-        total_2019 = sum(mention_counts['2019'].values())
-        total_2020 = sum(mention_counts['2020'].values())
+        total_2019 = num_papers['2019']
+        total_2020 = num_papers['2020']
         total = total_2019 + total_2020
         print('total', total_2019, total_2020)
         for m, obs2 in mention_counts['2020'].most_common(100):
@@ -53,14 +56,14 @@ def main():
     elif mode == 'monthly':
         total_2020_counter = Counter()
         sorted_keys = sorted(mention_counts.keys())
-        papers_per_month = {}
         for key, counts in mention_counts.items():
-            papers_per_month[key] = sum(counts.values())
             if key.startswith('2020'):
                 total_2020_counter.update(counts)
-        
+
+        print('total', ','.join(str(num_papers[key]) for key in sorted_keys))
+
         for m, _ in total_2020_counter.most_common(100):
-            print(m, ','.join('{:3.2f}'.format(100. * mention_counts[key][m] / papers_per_month[key]) for key in sorted_keys)) 
+            print(m, ','.join('{:3.2f}'.format(100. * mention_counts[key][m] / num_papers[key]) for key in sorted_keys))
 
 
 if __name__ == '__main__':
